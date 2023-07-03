@@ -1,44 +1,32 @@
-**!! Atenção: Renomeie o seu repositório para (Tema)_(NomeDoProjeto). !!** 
+# Beauty Salon Schedule
 
-Temas:
- - Grafos1
- - Grafos2
- - PD
- - D&C
- - Greed
- - Final 
- 
- **!! *Não coloque os nomes dos alunos no título do repositório*. Exemplo de título correto: Grafos2_Labirinto-do-Minotauro !!**
- 
- (Apague essa seção)
-
-# NomedoProjeto
-
-**Número da Lista**: X<br>
-**Conteúdo da Disciplina**: XXXXXXXXXX<br>
+**Número da Lista**: 5<br>
+**Conteúdo da Disciplina**: Programacao Dinâmica - Weighted Interval Scheduling <br>
 
 ## Alunos
 |Matrícula | Aluno |
 | -- | -- |
-| xx/xxxxxx  |  xxxx xxxx xxxxx |
-| xx/xxxxxx  |  xxxx xxxx xxxxx |
+|20/0025058| Mayara Alves de Oliveira
+|20/2046283| Millena de Abreu Queiroz
 
 ## Sobre 
-Descreva os objetivos do seu projeto e como ele funciona. 
+Um salão de beleza tem um conjunto de serviços disponíveis, cada um com uma duração e um valor associado. O objetivo é agendar esses serviços de forma que o valor total seja maximizado, considerando as restrições de tempo. Cada cliente tem um horário de chegada e partida específico, e o salão precisa garantir que não haja sobreposição de horários para evitar atrasos ou conflitos, para isso utilizaremos o algoritmo de programação dinâmica de Weighted Interval Scheduling que é uma abordagem eficiente para resolver esse problema de agendamento de forma ótima. Ele usa a técnica de memoização para evitar recálculos desnecessários e encontra a sequência de serviços com o valor máximo possível.
 
 ## Screenshots
 Adicione 3 ou mais screenshots do projeto em funcionamento.
 
 ## Instalação 
-**Linguagem**: xxxxxx<br>
-**Framework**: (caso exista)<br>
-Descreva os pré-requisitos para rodar o seu projeto e os comandos necessários.
+**Linguagem**: python <br><br>
+- sudo apt-get install python3-tk <br>
+- pip install customtkinter <br>
+- pip install tkinter <br>
 
 ## Uso 
-Explique como usar seu projeto caso haja algum passo a passo após o comando de execução.
-
-## Outros 
-Quaisquer outras informações sobre seu projeto podem ser descritas abaixo.
+1. Clone este repositório em sua máquina local.
+2. Abra o terminal e navegue até a pasta do projeto.
+3. Instale as bibliotecas necessárias (vide tópico "Instalação")
+4. Execute o aplicativo app.py com o Run Python File
+ 
 
 
 
