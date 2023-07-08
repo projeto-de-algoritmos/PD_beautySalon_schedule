@@ -1,129 +1,171 @@
 import tkinter as tk
 from tkinter import messagebox
 
-def agendamento_salaodebeleza(servicos):
-    servicos.sort(key=lambda x: x[1])  # Ordena os serviços pelo horário de término
-    n = len(servicos)
-    memo = [0] * (n+1)
 
-    for i in range(1, n+1):
-        valor = servicos[i-1][2]
+def weighted_interval_scheduling(intervals):
+    intervals.sort(key=lambda x: x[1])  # Ordena os intervalos pelo horário de término
+    n = len(intervals)
+    memo = [0] * (n + 1)
+
+    for i in range(1, n + 1):
+        value = intervals[i - 1][2]
         j = i - 1
-        while j >= 1 and servicos[j-1][1] > servicos[i-1][0]:
+        while j >= 1 and intervals[j - 1][1] > intervals[i - 1][0]:
             j -= 1
-        valor += memo[j]
-        memo[i] = max(valor, memo[i-1])
+        value += memo[j]
+        memo[i] = max(value, memo[i - 1])
 
-    agendados = []
+    schedule = []
     i = n
     while i > 0:
-        while i > 1 and memo[i] == memo[i-1]:
+        if intervals[i - 1][2] + memo[i - 1] >= memo[i]:
+            schedule.append(intervals[i - 1])
+            j = i - 1
+            while j >= 1 and intervals[j - 1][1] > intervals[i - 1][0]:
+                j -= 1
+            i = j
+        else:
             i -= 1
-        agendados.append(servicos[i-1])
-        i -= 1
-    agendados.reverse()
+    schedule.reverse()
 
-    return agendados
+    return schedule
 
-def agendar():
-    servicos = []
-    try:
-        for i in range(len(entry_nomes)):
-            nome = entry_nomes[i].get()
-            inicio = int(entry_horarios_inicio[i].get())
-            fim = int(entry_horarios_fim[i].get())
-            valor = float(entry_valor[i].get())
-            servicos.append((inicio, fim, valor, nome))
 
-        agendados = agendamento_salaodebeleza(servicos)
+def has_conflict(interval1, interval2):
+    return interval1[1] > interval2[0] and interval1[0] < interval2[1]
 
-        for widget in frame_agenda.winfo_children():
-            widget.destroy()
 
-        for i, (inicio, fim, valor, nome) in enumerate(agendados):
-            label_cliente = tk.Label(frame_agenda, text=f"Cliente {i+1}: {inicio}h - {fim}h - Valor: R$ {valor:.2f} - Nome: {nome}")
-            label_cliente.pack()
+def handle_submit():
+    num_intervals = int(entry_num_intervals.get())
 
-    except ValueError:
-        messagebox.showerror("Erro", "Digite valores válidos para os horários e valor.")
+    intervals = []
+    for i in range(num_intervals):
+        name = entry_names[i].get()
+        description = entry_descriptions[i].get()
+        start = int(entry_starts[i].get())
+        end = int(entry_ends[i].get())
+        value = int(entry_values[i].get())
+        intervals.append((start, end, value, name, description))
 
+    has_conflict_flag = False
+    conflicting_intervals = []
+    for i in range(num_intervals - 1):
+        for j in range(i + 1, num_intervals):
+            if has_conflict(intervals[i][:2], intervals[j][:2]):
+                has_conflict_flag = True
+                conflicting_intervals.append((i, j))
+
+    if has_conflict_flag:
+        filtered_intervals = []
+        conflict_set = set()
+        for interval_pair in conflicting_intervals:
+            interval1 = intervals[interval_pair[0]]
+            interval2 = intervals[interval_pair[1]]
+            if interval1[2] > interval2[2]:
+                conflict_set.add(interval_pair[1])
+                filtered_intervals.append(interval1)
+            else:
+                conflict_set.add(interval_pair[0])
+                filtered_intervals.append(interval2)
+
+        result = weighted_interval_scheduling(filtered_intervals)
+
+        final_result = []
+        for i in range(num_intervals):
+            if i not in conflict_set:
+                final_result.append(intervals[i])
+        final_result.extend(result)
+
+    else:
+        final_result = weighted_interval_scheduling(intervals)
+
+    final_result.sort(key=lambda x: x[0])
+
+    # Remover duplicatas de pessoas agendadas
+    unique_people = set()
+    unique_result = []
+    for interval in final_result:
+        person = interval[3]
+        if person not in unique_people:
+            unique_result.append(interval)
+            unique_people.add(person)
+
+    messagebox.showinfo("Agendamento", format_result(unique_result))
+
+
+def format_result(result):
+    formatted = "Intervalos agendados:\n"
+    for interval in result:
+        formatted += f"Nome: {interval[3]}, Descrição: {interval[4]}, Início: {interval[0]}, Término: {interval[1]}, Valor: {interval[2]}\n"
+    return formatted
+
+
+# Interface Gráfica
 root = tk.Tk()
-root.title("Sistema de Agendamento de Salão de Beleza")
-root.geometry("1000x700")
+root.title("Agendamento de Intervalos")
+root.geometry("400x400")
 
-frame_inputs = tk.Frame(root)
-frame_inputs.pack(padx=20, pady=20, expand=True, fill="both", anchor="center")
+frame = tk.Frame(root)
+frame.pack(pady=20)
 
-entry_num_clientes = tk.Entry(frame_inputs)
-entry_num_clientes.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+label_num_intervals = tk.Label(frame, text="Número de Intervalos:")
+label_num_intervals.pack()
 
-entry_nomes = []
-entry_horarios_inicio = []
-entry_horarios_fim = []
-entry_valor = []
+entry_num_intervals = tk.Entry(frame)
+entry_num_intervals.pack(pady=10)
 
-def criar_campos_entrada():
-    try:
-        num_clientes = int(entry_num_clientes.get())
-    except ValueError:
-        messagebox.showerror("Erro", "Digite um valor válido para o número de clientes.")
-        return
+frame_intervals = tk.Frame(root)
+frame_intervals.pack()
 
-    for widget in frame_inputs.winfo_children():
-        widget.destroy()
+entry_names = []
+entry_descriptions = []
+entry_starts = []
+entry_ends = []
+entry_values = []
 
-    label_nome = tk.Label(frame_inputs, text="Nome do cliente:")
-    label_nome.grid(row=2, column=1, padx=5, pady=5, sticky="e")
+def create_interval_fields():
+    num_intervals = int(entry_num_intervals.get())
 
-    label_inicio = tk.Label(frame_inputs, text="Início do serviço:")
-    label_inicio.grid(row=2, column=2, padx=5, pady=5, sticky="e")
+    for i in range(num_intervals):
+        label_name = tk.Label(frame_intervals, text=f"Nome Intervalo {i+1}:")
+        label_name.pack()
 
-    label_fim = tk.Label(frame_inputs, text="Término do serviço:")
-    label_fim.grid(row=2, column=3, padx=5, pady=5, sticky="e")
+        entry_name = tk.Entry(frame_intervals)
+        entry_name.pack()
+        entry_names.append(entry_name)
 
-    label_valor = tk.Label(frame_inputs, text="Valor do serviço:")
-    label_valor.grid(row=2, column=4, padx=5, pady=5, sticky="e")
+        label_description = tk.Label(frame_intervals, text=f"Descrição Intervalo {i+1}:")
+        label_description.pack()
 
-    for i in range(num_clientes):
-        label_nome = tk.Label(frame_inputs, text=f"Nome do cliente {i+1}:")
-        label_nome.grid(row=i+3, column=1, sticky="e")
+        entry_description = tk.Entry(frame_intervals)
+        entry_description.pack()
+        entry_descriptions.append(entry_description)
 
-        entry_nome = tk.Entry(frame_inputs)
-        entry_nome.grid(row=i+3, column=2, padx=5, pady=5)
-        entry_nomes.append(entry_nome)
+        label_start = tk.Label(frame_intervals, text=f"Início Intervalo {i+1}:")
+        label_start.pack()
 
-        label_inicio = tk.Label(frame_inputs, text=f"Início do serviço (cliente {i+1}):")
-        label_inicio.grid(row=i+3, column=3, sticky="e")
+        entry_start = tk.Entry(frame_intervals)
+        entry_start.pack()
+        entry_starts.append(entry_start)
 
-        entry_inicio = tk.Entry(frame_inputs)
-        entry_inicio.grid(row=i+3, column=4, padx=5, pady=5)
-        entry_horarios_inicio.append(entry_inicio)
+        label_end = tk.Label(frame_intervals, text=f"Término Intervalo {i+1}:")
+        label_end.pack()
 
-        label_fim = tk.Label(frame_inputs, text=f"Término do serviço (cliente {i+1}):")
-        label_fim.grid(row=i+3, column=5, sticky="e")
+        entry_end = tk.Entry(frame_intervals)
+        entry_end.pack()
+        entry_ends.append(entry_end)
 
-        entry_fim = tk.Entry(frame_inputs)
-        entry_fim.grid(row=i+3, column=6, padx=5, pady=5)
-        entry_horarios_fim.append(entry_fim)
+        label_value = tk.Label(frame_intervals, text=f"Valor Intervalo {i+1}:")
+        label_value.pack()
 
-        label_valor = tk.Label(frame_inputs, text=f"Valor do serviço (cliente {i+1}):")
-        label_valor.grid(row=i+3, column=7, sticky="e")
+        entry_value = tk.Entry(frame_intervals)
+        entry_value.pack()
+        entry_values.append(entry_value)
 
-        entry_val = tk.Entry(frame_inputs)
-        entry_val.grid(row=i+3, column=8, padx=5, pady=5)
-        entry_valor.append(entry_val)
+    btn_submit = tk.Button(root, text="Agendar", command=handle_submit)
+    btn_submit.pack(pady=10)
 
-    # Botão para agendar os serviços
-    btn_agendar = tk.Button(frame_inputs, text="Agendar", command=agendar)
-    btn_agendar.grid(row=num_clientes+3, column=4, padx=5, pady=10, sticky="e")
+btn_create_fields = tk.Button(frame, text="Criar Campos", command=create_interval_fields)
+btn_create_fields.pack()
 
-# Botão para criar os campos de entrada
-btn_criar_campos = tk.Button(frame_inputs, text="Criar Campos", command=criar_campos_entrada)
-btn_criar_campos.grid(row=1, column=2, padx=5, pady=10, sticky="w")
-
-# Frame para exibir os dados agendados
-frame_agenda = tk.Frame(root)
-frame_agenda.pack(padx=20, pady=20)
-
-# Execução da janela principal
 root.mainloop()
