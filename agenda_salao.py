@@ -31,10 +31,6 @@ def weighted_interval_scheduling(intervals):
     return schedule
 
 
-def has_conflict(interval1, interval2):
-    return interval1[1] > interval2[0] and interval1[0] < interval2[1]
-
-
 def handle_submit():
     num_intervals = int(entry_num_intervals.get())
 
@@ -47,54 +43,14 @@ def handle_submit():
         value = int(entry_values[i].get())
         intervals.append((start, end, value, name, description))
 
-    has_conflict_flag = False
-    conflicting_intervals = []
-    for i in range(num_intervals - 1):
-        for j in range(i + 1, num_intervals):
-            if has_conflict(intervals[i][:2], intervals[j][:2]):
-                has_conflict_flag = True
-                conflicting_intervals.append((i, j))
+    result = weighted_interval_scheduling(intervals)
 
-    if has_conflict_flag:
-        filtered_intervals = []
-        conflict_set = set()
-        for interval_pair in conflicting_intervals:
-            interval1 = intervals[interval_pair[0]]
-            interval2 = intervals[interval_pair[1]]
-            if interval1[2] > interval2[2]:
-                conflict_set.add(interval_pair[1])
-                filtered_intervals.append(interval1)
-            else:
-                conflict_set.add(interval_pair[0])
-                filtered_intervals.append(interval2)
-
-        result = weighted_interval_scheduling(filtered_intervals)
-
-        final_result = []
-        for i in range(num_intervals):
-            if i not in conflict_set:
-                final_result.append(intervals[i])
-        final_result.extend(result)
-
-    else:
-        final_result = weighted_interval_scheduling(intervals)
-
-    final_result.sort(key=lambda x: x[0])
-
-    # Remover duplicatas de pessoas agendadas
-    unique_people = set()
-    unique_result = []
-    for interval in final_result:
-        person = interval[3]
-        if person not in unique_people:
-            unique_result.append(interval)
-            unique_people.add(person)
-
-    messagebox.showinfo("Agendamento", format_result(unique_result))
+    total_value = sum(interval[2] for interval in result)
+    messagebox.showinfo("Agendamento", f"Valor total: {total_value}\n\n{format_result(result)}")
 
 
 def format_result(result):
-    formatted = "Agendamento:\n"
+    formatted = "Agendamentos:\n"
     for interval in result:
         formatted += f"Nome: {interval[3]}, Descrição: {interval[4]}, Início: {interval[0]}, Término: {interval[1]}, Valor: {interval[2]}\n"
     return formatted
@@ -108,7 +64,7 @@ root.geometry("400x400")
 frame = tk.Frame(root)
 frame.pack(pady=20)
 
-label_num_intervals = tk.Label(frame, text="Número de Agendamentos:")
+label_num_intervals = tk.Label(frame, text="Número de agendamentos:")
 label_num_intervals.pack()
 
 entry_num_intervals = tk.Entry(frame)
@@ -127,7 +83,7 @@ def create_interval_fields():
     num_intervals = int(entry_num_intervals.get())
 
     for i in range(num_intervals):
-        label_name = tk.Label(frame_intervals, text=f"Nome da Cliente {i+1}:")
+        label_name = tk.Label(frame_intervals, text=f"Nome cliente {i+1}:")
         label_name.pack()
 
         entry_name = tk.Entry(frame_intervals)
