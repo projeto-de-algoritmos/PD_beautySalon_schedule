@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+import tkinter.font as tkfont
 
 
 def weighted_interval_scheduling(intervals):
@@ -52,14 +53,14 @@ def handle_submit():
 def format_result(result):
     formatted = "Agendamentos:\n"
     for interval in result:
-        formatted += f"Nome: {interval[3]}, Descrição: {interval[4]}, Início: {interval[0]}, Término: {interval[1]}, Valor: {interval[2]}\n"
+        formatted += f"Nome: {interval[3]},\n Descrição: {interval[4]},\n Início: {interval[0]},\n Término: {interval[1]},\n Valor: {interval[2]}\n"
     return formatted
 
 
 # Interface Gráfica
 root = tk.Tk()
 root.title("Beauty Salon Schedule")
-root.geometry("400x400")
+root.geometry("1200x720")
 
 frame = tk.Frame(root)
 frame.pack(pady=20)
@@ -82,41 +83,48 @@ entry_values = []
 def create_interval_fields():
     num_intervals = int(entry_num_intervals.get())
 
+    # Configurar estilo de fonte em negrito
+    bold_font = tkfont.Font(weight="bold")
+
     for i in range(num_intervals):
-        label_name = tk.Label(frame_intervals, text=f"Nome cliente {i+1}:")
-        label_name.pack()
+        label_client = tk.Label(frame_intervals, text=f"Cliente {i+1}", font=bold_font)
+        label_client.grid(row=2*i, column=0, pady=(5, 5))
+
+        label_name = tk.Label(frame_intervals, text="Nome:")
+        label_name.grid(row=2*i+1, column=0, padx=5)
 
         entry_name = tk.Entry(frame_intervals)
-        entry_name.pack()
+        entry_name.grid(row=2*i+1, column=1)
         entry_names.append(entry_name)
 
-        label_description = tk.Label(frame_intervals, text=f"Descrição {i+1}:")
-        label_description.pack()
+        label_description = tk.Label(frame_intervals, text="Descrição:")
+        label_description.grid(row=2*i+1, column=2, padx=5)
 
         entry_description = tk.Entry(frame_intervals)
-        entry_description.pack()
+        entry_description.grid(row=2*i+1, column=3)
         entry_descriptions.append(entry_description)
 
-        label_start = tk.Label(frame_intervals, text=f"Início {i+1}:")
-        label_start.pack()
+        label_start = tk.Label(frame_intervals, text="Início:")
+        label_start.grid(row=2*i+1, column=4, padx=5)
 
         entry_start = tk.Entry(frame_intervals)
-        entry_start.pack()
+        entry_start.grid(row=2*i+1, column=5)
         entry_starts.append(entry_start)
 
-        label_end = tk.Label(frame_intervals, text=f"Término {i+1}:")
-        label_end.pack()
+        label_end = tk.Label(frame_intervals, text="Término:")
+        label_end.grid(row=2*i+1, column=6, padx=5)
 
         entry_end = tk.Entry(frame_intervals)
-        entry_end.pack()
+        entry_end.grid(row=2*i+1, column=7)
         entry_ends.append(entry_end)
 
-        label_value = tk.Label(frame_intervals, text=f"Valor {i+1}:")
-        label_value.pack()
+        label_value = tk.Label(frame_intervals, text="Valor:")
+        label_value.grid(row=2*i+1, column=8, padx=5)
 
         entry_value = tk.Entry(frame_intervals)
-        entry_value.pack()
+        entry_value.grid(row=2*i+1, column=9)
         entry_values.append(entry_value)
+        
 
     btn_submit = tk.Button(root, text="Agendar", command=handle_submit)
     btn_submit.pack(pady=10)
