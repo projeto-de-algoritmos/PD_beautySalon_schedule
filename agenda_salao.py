@@ -19,7 +19,7 @@ def weighted_interval_scheduling(intervals):
     schedule = []
     i = n
     while i > 0:
-        if intervals[i - 1][2] + memo[i - 1] >= memo[i]:
+        if intervals[i - 1][2] + memo[i - 2] >= memo[i - 1]:
             schedule.append(intervals[i - 1])
             j = i - 1
             while j >= 1 and intervals[j - 1][1] > intervals[i - 1][0]:
@@ -51,9 +51,9 @@ def handle_submit():
 
 
 def format_result(result):
-    formatted = "Agendamentos:\n"
+    formatted = "Intervalos agendados:\n"
     for interval in result:
-        formatted += f"Nome: {interval[3]},\n Descrição: {interval[4]},\n Início: {interval[0]},\n Término: {interval[1]},\n Valor: {interval[2]}\n"
+        formatted += f"Nome: {interval[3]}, Descrição: {interval[4]}, Início: {interval[0]}, Término: {interval[1]}, Valor: {interval[2]}\n"
     return formatted
 
 
