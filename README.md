@@ -31,7 +31,7 @@ Um salão de beleza tem um conjunto de serviços disponíveis, cada um com uma d
 1. Clone este repositório em sua máquina local.
 2. Abra o terminal e navegue até a pasta do projeto.
 3. Instale as bibliotecas necessárias (vide tópico "Instalação")
-4. Execute o aplicativo app.py com o Run Python File
+4. Execute o aplicativo agenda_salao.py com o Run Python File
  
 
 
